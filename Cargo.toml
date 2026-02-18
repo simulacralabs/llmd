@@ -2,5 +2,25 @@
 name = "llmd"
 version = "0.1.0"
 edition = "2024"
+description = "Context management CLI for agentic development — reads, composes, and serves .llms/ documentation."
+license = "MIT"
+repository = "https://github.com/simulacralabs/llmd"
+keywords = ["llm", "agents", "documentation", "cli", "markdown"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "llmd"
+path = "src/main.rs"
 
 [dependencies]
+# CLI argument parsing
+clap = { version = "4.5", features = ["derive"] }
+
+# Error handling
+anyhow = "1.0"
+
+# Recursive directory walking (for mdbook generation and listing .llms/ files)
+walkdir = "2.5"
+
+# Regex for search and read --grep
+regex-lite = "0.1"

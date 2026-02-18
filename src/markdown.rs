@@ -24,10 +24,11 @@ pub fn extract_section(source: &str, section: &str) -> Option<String> {
         if start_line.is_none() && heading_text.contains(&needle) {
             start_line = Some(i);
             target_depth = depth;
-        } else if let Some(start) = start_line {
-            if depth <= target_depth && i > start {
-                return Some(lines[start..i].join("\n"));
-            }
+        } else if let Some(start) = start_line
+            && depth <= target_depth
+            && i > start
+        {
+            return Some(lines[start..i].join("\n"));
         }
     }
 
@@ -52,7 +53,7 @@ pub fn list_headings(source: &str) -> Vec<(usize, String)> {
 /// Estimates the number of tokens in `text` using the heuristic of 1 token per
 /// 4 characters (a conservative approximation for English prose and code).
 pub fn estimate_tokens(text: &str) -> usize {
-    (text.len() + 3) / 4
+    text.len().div_ceil(4)
 }
 
 /// Returns lines `start..=end` (1-indexed) from `source`.

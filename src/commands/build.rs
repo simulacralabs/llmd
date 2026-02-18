@@ -4,7 +4,7 @@
 //! directory, then calls `mdbook build`. Output goes to .llmd/book/ by default.
 //! Requires mdbook to be installed: `cargo install mdbook`
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::Parser;
 use std::collections::BTreeMap;
 use std::fs;
@@ -100,8 +100,7 @@ pub fn generate_mdbook(llmd: &Path) -> Result<PathBuf> {
             if let Some(parent) = dest.parent() {
                 fs::create_dir_all(parent).ok();
             }
-            fs::copy(file, &dest)
-                .with_context(|| format!("Failed to copy {}", file.display()))?;
+            fs::copy(file, &dest).with_context(|| format!("Failed to copy {}", file.display()))?;
             summary.push_str(&format!("- [{title}]({rel_str})\n"));
         }
     }

@@ -3,7 +3,7 @@
 //! Searches upward from the current working directory to find the project root
 //! (identified by the presence of .llmd/, Cargo.toml, package.json, .git, etc.).
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use std::path::{Path, PathBuf};
 
 /// Resolves the path to the `.llmd/` directory, searching upward from `start`.
@@ -37,8 +37,7 @@ pub fn list_all_files(llmd: &Path) -> Vec<PathBuf> {
         .into_iter()
         .flatten()
         .filter(|e| {
-            e.file_type().is_file()
-                && e.path().extension().and_then(|x| x.to_str()) == Some("md")
+            e.file_type().is_file() && e.path().extension().and_then(|x| x.to_str()) == Some("md")
         })
         .map(|e| e.path().to_path_buf())
         .collect()

@@ -52,8 +52,8 @@ pub fn run(args: ComposeArgs) -> Result<()> {
     let llmd = llmd_dir::find(&cwd)?;
 
     let catme_path = llmd_dir::catme_path(&llmd);
-    let catme = fs::read_to_string(&catme_path)
-        .context("Cannot read catme.md — run `llmd init` first")?;
+    let catme =
+        fs::read_to_string(&catme_path).context("Cannot read catme.md — run `llmd init` first")?;
 
     let catme_excerpt = extract_catme_excerpt(&catme);
     let all_files = llmd_dir::list_all_files(&llmd);
@@ -72,7 +72,13 @@ pub fn run(args: ComposeArgs) -> Result<()> {
     };
 
     let task = load_task(&args).unwrap_or_default();
-    let doc = build_document(&task, &catme_excerpt, &args.include, &llmd, &chosen_sections)?;
+    let doc = build_document(
+        &task,
+        &catme_excerpt,
+        &args.include,
+        &llmd,
+        &chosen_sections,
+    )?;
 
     match &args.output {
         Some(out_path) => {
@@ -153,7 +159,9 @@ fn run_interactive_mode(index: &[IndexedSection]) -> Result<Vec<IndexedSection>>
     }
 
     // Print the index to stdout so the agent can read it
-    println!("Available sections — enter numbers to include (comma or newline separated, blank line to finish):\n");
+    println!(
+        "Available sections — enter numbers to include (comma or newline separated, blank line to finish):\n"
+    );
     for (i, section) in index.iter().enumerate() {
         println!("[{}] {}", i + 1, section.label);
     }
@@ -176,7 +184,10 @@ fn run_interactive_mode(index: &[IndexedSection]) -> Result<Vec<IndexedSection>>
                 if n >= 1 && n <= index.len() && seen.insert(n) {
                     chosen_indices.push(n - 1); // convert to 0-indexed
                 } else if n < 1 || n > index.len() {
-                    eprintln!("  warning: {n} is out of range (1–{}), skipped", index.len());
+                    eprintln!(
+                        "  warning: {n} is out of range (1–{}), skipped",
+                        index.len()
+                    );
                 }
             }
         }
@@ -196,8 +207,8 @@ fn run_interactive_mode(index: &[IndexedSection]) -> Result<Vec<IndexedSection>>
 
 /// Returns all sections from the index whose headings contain any keyword.
 /// Also includes sections from explicitly requested `--include` files.
-fn keyword_match_sections<'a>(
-    index: &'a [IndexedSection],
+fn keyword_match_sections(
+    index: &[IndexedSection],
     keywords: &[String],
     include_files: &[String],
 ) -> Vec<IndexedSection> {
@@ -259,8 +270,8 @@ fn build_document(
     for topic in include_files {
         let path = llmd.join(format!("{topic}.md"));
         if path.exists() {
-            let content = fs::read_to_string(&path)
-                .with_context(|| format!("Cannot read {topic}.md"))?;
+            let content =
+                fs::read_to_string(&path).with_context(|| format!("Cannot read {topic}.md"))?;
             doc.push_str(&format!("## {topic}\n\n"));
             doc.push_str(&content);
             if !content.ends_with('\n') {
@@ -337,7 +348,10 @@ fn extract_catme_excerpt(catme: &str) -> String {
 fn extract_keywords(task: &str) -> Vec<String> {
     let mut seen = HashSet::new();
     task.split_whitespace()
-        .map(|w| w.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase())
+        .map(|w| {
+            w.trim_matches(|c: char| !c.is_alphanumeric())
+                .to_lowercase()
+        })
         .filter(|w| w.len() > 3)
         .filter(|w| seen.insert(w.clone()))
         .collect()

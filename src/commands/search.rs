@@ -33,10 +33,7 @@ pub fn run(args: SearchArgs) -> Result<()> {
     };
 
     if !search_root.exists() {
-        anyhow::bail!(
-            "Search directory does not exist: {}",
-            search_root.display()
-        );
+        anyhow::bail!("Search directory does not exist: {}", search_root.display());
     }
 
     let re = regex_lite::Regex::new(&args.query)
@@ -77,12 +74,16 @@ pub fn run(args: SearchArgs) -> Result<()> {
             println!("\n{}:", rel.display());
             let mut prev: Option<usize> = None;
             for &idx in &context_indices {
-                if let Some(p) = prev {
-                    if idx > p + 1 {
-                        println!("  ...");
-                    }
+                if let Some(p) = prev
+                    && idx > p + 1
+                {
+                    println!("  ...");
                 }
-                let marker = if match_indices.contains(&idx) { ">" } else { " " };
+                let marker = if match_indices.contains(&idx) {
+                    ">"
+                } else {
+                    " "
+                };
                 println!("  {marker} {:4}: {}", idx + 1, lines[idx]);
                 prev = Some(idx);
             }

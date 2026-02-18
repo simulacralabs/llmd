@@ -3,7 +3,7 @@
 //! Supports reading the full file, a specific heading section, a line range,
 //! or a grep-filtered view. Optionally prints a token count estimate first.
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::Parser;
 use std::fs;
 use std::path::PathBuf;
@@ -137,10 +137,10 @@ fn grep_lines(content: &str, pattern: &str) -> Result<String> {
     let mut result = String::new();
     let mut prev: Option<usize> = None;
     for &idx in &matched_indices {
-        if let Some(p) = prev {
-            if idx > p + 1 {
-                result.push_str("...\n");
-            }
+        if let Some(p) = prev
+            && idx > p + 1
+        {
+            result.push_str("...\n");
         }
         result.push_str(lines[idx]);
         result.push('\n');

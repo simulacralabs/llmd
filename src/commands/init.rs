@@ -3,7 +3,7 @@
 //! Scans the project root for known agent markdown files and copies them into
 //! .llmd/imported/. Then generates a catme.md navigation index.
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::Parser;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -28,9 +28,7 @@ pub fn run(args: InitArgs) -> Result<()> {
     let catme = llmd.join("catme.md");
 
     if llmd.exists() && !args.update {
-        bail!(
-            ".llmd/ already exists. Use --update to refresh it without losing existing files."
-        );
+        bail!(".llmd/ already exists. Use --update to refresh it without losing existing files.");
     }
 
     fs::create_dir_all(&imported).context("Failed to create .llmd/imported/")?;
@@ -44,10 +42,7 @@ pub fn run(args: InitArgs) -> Result<()> {
         let dest = imported.join(&dest_name);
 
         fs::copy(&file.path, &dest).with_context(|| {
-            format!(
-                "Failed to copy {} to .llmd/imported/",
-                file.path.display()
-            )
+            format!("Failed to copy {} to .llmd/imported/", file.path.display())
         })?;
 
         let rel = file.path.strip_prefix(&root).unwrap_or(&file.path);
@@ -100,7 +95,9 @@ fn generate_catme(root: &Path, imported: &[(String, &'static str)]) -> String {
     let mut out = String::new();
 
     out.push_str(&format!("# {project_name}\n\n"));
-    out.push_str("> **Agent entry point.** Read this file first to orient yourself in the project.\n\n");
+    out.push_str(
+        "> **Agent entry point.** Read this file first to orient yourself in the project.\n\n",
+    );
 
     out.push_str("## Project Summary\n\n");
     out.push_str("<!-- Describe what this project does and why it exists. One paragraph. -->\n\n");
@@ -117,9 +114,7 @@ fn generate_catme(root: &Path, imported: &[(String, &'static str)]) -> String {
 
     if !imported.is_empty() {
         out.push_str("### Imported Agent Config Files\n\n");
-        out.push_str(
-            "These files were discovered in your project and imported automatically:\n\n",
-        );
+        out.push_str("These files were discovered in your project and imported automatically:\n\n");
         for (name, description) in imported {
             out.push_str(&format!(
                 "- [imported/{name}](imported/{name}) — {description}\n"

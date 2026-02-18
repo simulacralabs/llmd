@@ -4,7 +4,7 @@
 //! directory, then calls `mdbook serve`. Requires mdbook to be installed:
 //! `cargo install mdbook`
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::Parser;
 use std::process::Command;
 

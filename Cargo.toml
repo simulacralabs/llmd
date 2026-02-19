@@ -1,6 +1,6 @@
 [package]
 name = "llmd"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2024"
 description = "Context management CLI for agentic development — reads, composes, and serves .llms/ documentation."
 license = "MIT"

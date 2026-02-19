@@ -40,8 +40,8 @@ cargo install --path .
 
 ## Navigation
 
-- [architecture.md](architecture.md) — entry point, module structure, data flow, and how the seven commands are dispatched
-- [cli.md](cli.md) — full reference for every CLI command: flags, modes, examples, and output format
+- [architecture.md](architecture.md) — entry point, module structure, data flow, and how the eight commands are dispatched
+- [cli.md](cli.md) — full reference for every CLI command: flags, examples, and output format
 - [conventions.md](conventions.md) — Rust code style, error handling patterns, module organisation, and testing approach
 - [deployment.md](deployment.md) — release process, `scripts/release.sh`, `scripts/check.sh`, and crates.io publishing
 

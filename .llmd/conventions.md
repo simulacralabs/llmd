@@ -20,7 +20,7 @@ Use `anyhow::bail!("…")` for early exits with a plain error message (no `?` op
 
 ## Stdout vs Stderr
 
-- **stdout** — primary command output only: the content the user or downstream pipeline expects to consume (e.g. composed document, file contents, bootstrap prompt, section index in interactive mode).
+- **stdout** — primary command output only: the content the user or downstream pipeline expects to consume (e.g. composed document, file contents, bootstrap prompt, section index in compose).
 - **stderr** — all diagnostic output: progress messages, warnings, token counts, match counts, paths of written files. Use `eprintln!` for these. Never use `println!` for diagnostic output.
 
 This rule ensures commands are composable with pipes:

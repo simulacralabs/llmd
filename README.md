@@ -38,8 +38,9 @@ llmd bootstrap > bootstrap-prompt.md   # or review before running
 # 3. Read the entry point (agents do this first)
 llmd read catme
 
-# 4. Compose a task-context document for your current task
-llmd compose "add error handling to the auth module" > context.md
+# 4. Compose a task-context document (view index first, then select sections)
+llmd index
+llmd compose --sections 1,2,3 "add error handling to the auth module" > context.md
 
 # 5. Browse the docs in a browser
 llmd serve
@@ -53,10 +54,12 @@ A `.llmd/` directory contains:
 
 ```
 .llmd/
-  catme.md          # Agent entry point — read this first
-  <topic>.md        # Topic-specific documentation (one file per concern)
-  personas/         # Role-specific context (e.g. security-expert.md)
-  imported/         # Existing agent config files, auto-imported by llmd init
+  catme.md              # Agent entry point — read this first
+  <topic>.md            # Topic-specific documentation (one file per concern)
+  context-mappings.json # Optional: label-to-topics mapping for llmd compose --issue
+  personas/             # Role-specific context (e.g. security-expert.md)
+  imported/             # Existing agent config files, auto-imported by llmd init
+  issues/               # Issue tracker (created by llmd issue init)
 ```
 
 ### catme.md
@@ -131,37 +134,42 @@ Options:
 - `--lines <start:end>` — read a line range (1-indexed, inclusive)
 - `--tokens` — print estimated token count to stderr before content
 
-### `llmd compose [TASK] [OPTIONS]`
+### `llmd index`
 
-Compose a task-context document from `.llmd/` content.
-
-**Keyword mode** (default): matches the task description against `.llmd/` headings automatically.
+Print the numbered section index. Use this first to see available sections, then pass section numbers to `llmd compose --sections`.
 
 ```sh
-llmd compose "implement rate limiting on the API"
-llmd compose "refactor the auth module" --include auth-flow,api-standards
-llmd compose --from task.md --output context.md
-```
-
-**Interactive mode** (`--interactive`): prints a numbered index of all available H2/H3 sections, then reads your selection from stdin. Designed for agents — the index is compact (one line per section), so the agent can choose precisely what to include before any content is loaded.
-
-```sh
-llmd compose --interactive
+llmd index
 
 # Output:
-# Available sections — enter numbers to include:
-# [1] auth-flow > Session Validation
-# [2] auth-flow > Error Handling
-# [3] api-standards > Rate Limiting
+# Available sections — use with `llmd compose --sections <nums>`:
+# [1] architecture > Overview
+# [2] architecture > Entry Point and Dispatch
+# [3] conventions > Error Handling
 # ...
-#
-# Agent inputs: 2,3
-# → Composed document with only those two sections
+```
+
+### `llmd compose [OPTIONS] [TASK]`
+
+Compose a task-context document from `.llmd/` content. Use `llmd index` first to view the section index, then pass section numbers via `--sections`. With `--issue`, topics are auto-included from the label-to-topics mapping in `.llmd/context-mappings.json` unless `--no-auto-include` is set.
+
+```sh
+# Manual selection (view index first)
+llmd index
+llmd compose --sections 1,2,5 "implement rate limiting on the API"
+
+# From an issue — auto-include topics from labels
+llmd compose --issue 3 > context.md
+
+# From an issue — manual selection only
+llmd compose --issue 3 --no-auto-include --sections 2,4,6 > context.md
 ```
 
 Options:
 
-- `-i, --interactive` — interactive section selection mode
+- `-s, --sections <nums>` — section numbers from `llmd index` (comma-separated)
+- `--issue <id|slug>` — compose from an issue; auto-includes topics from label mapping
+- `--no-auto-include` — disable auto-inclusion when using `--issue`
 - `-I, --include <topic,...>` — explicitly include these topic files in full (comma-separated, no `.md`)
 - `--from <file>` — read the task description from a file
 - `--output <file>` — write the composed document to a file instead of stdout
@@ -211,9 +219,14 @@ A typical agentic session using `llmd`:
 Agent: llmd read catme
 → Gets project overview and navigation map
 
-Agent: llmd compose --interactive
-→ Sees compact section index, selects relevant sections
+Agent: llmd index
+→ Sees section index
+
+Agent: llmd compose --sections 2,4,7 "add error handling to auth"
 → Gets a precisely composed context document
+
+# Or with an issue (auto-include from labels):
+Agent: llmd compose --issue 3 > context.md
 
 Agent: llmd read auth-flow --section "Error Handling"
 → Gets the specific section it needs, token-efficiently

@@ -1,7 +1,9 @@
 pub mod bootstrap;
 pub mod build;
 pub mod compose;
+pub mod index;
 pub mod init;
+pub mod issue;
 pub mod read;
 pub mod search;
 pub mod serve;

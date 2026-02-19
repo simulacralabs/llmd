@@ -30,6 +30,11 @@ pub fn catme_path(llmd: &Path) -> PathBuf {
     llmd.join("catme.md")
 }
 
+/// Returns the path to `issues/` inside the given `.llmd/` directory.
+pub fn issues_path(llmd: &Path) -> PathBuf {
+    llmd.join("issues")
+}
+
 /// Lists all `.md` files in all subdirectories of the `.llmd/` directory, recursively.
 pub fn list_all_files(llmd: &Path) -> Vec<PathBuf> {
     use walkdir::WalkDir;

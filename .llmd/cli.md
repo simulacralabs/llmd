@@ -62,54 +62,49 @@ llmd read cli --lines 10:50
 llmd read catme --tokens
 ```
 
-## `llmd compose [TASK] [OPTIONS]`
+## `llmd index`
 
-Assembles a task-context document from `.llmd/` content and prints it to stdout (or writes to `--output`).
+Prints the numbered section index to stdout. No interaction. Use this first, then pass section numbers to `llmd compose --sections`.
 
-**Document structure:**
 ```
-# Task Context
-
-## Task
-<task description>
-
-## Project Overview
-<catme.md Project Summary + Technology Stack + Build sections>
-
-## <topic>           ← one section per --include file (full file contents)
-<full file content>
-
-## Relevant Sections
-### <topic-file>
-<extracted section content>
-...
-```
-
-**Keyword mode** (default): extracts keywords from the task description (words longer than 3 chars, lowercased, deduplicated, punctuation stripped), then includes all H2/H3 sections from topic files whose heading text contains any keyword.
-
-**Interactive mode** (`-i` / `--interactive`): prints a numbered section index to stdout:
-```
-Available sections — enter numbers to include (comma or newline separated, blank line to finish):
+Available sections — use with `llmd compose --sections <nums>`:
 
 [1] architecture > Overview
 [2] architecture > Entry Point and Dispatch
 ...
 ```
-Then reads a comma- or newline-separated list of numbers from stdin. A blank line terminates input. Invalid numbers produce a warning to stderr and are skipped.
+
+## `llmd compose [OPTIONS] [TASK]`
+
+Builds a context document from explicitly chosen sections and/or an issue. Two-step flow: run `llmd index` first, then `llmd compose --sections <nums>`.
+
+**With `--issue`:** when composing from an issue, topics are auto-included from `.llmd/context-mappings.json` based on the issue's labels, unless `--no-auto-include` is set. The mapping format:
+
+```json
+{
+  "label_to_topics": {
+    "auth-flow": ["auth-flow", "api-standards", "conventions"],
+    "parser": ["architecture", "conventions"]
+  }
+}
+```
 
 **Options:**
-- `-i, --interactive` — interactive section selection mode
-- `-I, --include <TOPIC,...>` — explicitly include these topic files in full (comma-separated, no `.md` extension). These appear before the keyword-matched sections.
-- `--from <FILE>` / `-f <FILE>` — read the task description from a file instead of the positional argument. Pass `-` as the task to read from stdin (reads one line).
-- `--output <FILE>` / `-o <FILE>` — write the document to a file instead of stdout.
+- `-s, --sections <NUMS>` — section numbers from `llmd index` (comma-separated)
+- `--issue <ID|SLUG>` — compose from an issue; auto-includes topics from label mapping
+- `--no-auto-include` — disable auto-inclusion when using `--issue` (select manually with `--sections`)
+- `-I, --include <TOPIC,...>` — explicitly include these topic files in full (comma-separated, no `.md` extension)
+- `--from <FILE>` / `-f <FILE>` — read the task description from a file
+- `--output <FILE>` / `-o <FILE>` — write the document to a file instead of stdout
 
-**Section index exclusions:** `catme.md` is always excluded from the index (it appears as the Project Overview instead). Files under `imported/` are excluded (raw config, not structured topic docs).
+**Section index exclusions:** `catme.md`, `imported/`, and `issues/` are excluded from the index.
 
 **Examples:**
 ```sh
-llmd compose "add error handling to the auth module"
-llmd compose "refactor the API layer" --include architecture,conventions
-llmd compose --interactive
+llmd index
+llmd compose --sections 1,2,5 "add error handling to the auth module"
+llmd compose --issue 3
+llmd compose --issue 3 --no-auto-include --sections 2,4,6
 llmd compose --from task.md --output context.md
 ```
 

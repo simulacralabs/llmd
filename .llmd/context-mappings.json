@@ -1,0 +1,8 @@
+{
+  "label_to_topics": {
+    "parser": ["architecture", "conventions"],
+    "conventions": ["conventions"],
+    "cli": ["cli", "conventions"],
+    "deployment": ["deployment"]
+  }
+}

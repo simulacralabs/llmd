@@ -93,10 +93,11 @@ The most complex command. Its data flow:
 2. Read `catme.md`; extract Project Summary, Technology Stack, and Build sections via `markdown::extract_section()` to form `catme_excerpt`.
 3. List all `.md` files via `llmd_dir::list_all_files()`. Exclude `catme.md` and `imported/` files.
 4. Build a flat `Vec<IndexedSection>` by calling `markdown::list_headings()` on each file and collecting H2 and H3 headings.
-5. In **keyword mode**: call `extract_keywords(task)` (splits on whitespace, strips punctuation, lowercases, deduplicates, filters words ≤ 3 chars), then match keywords against `section.heading.to_lowercase()`.
-6. In **interactive mode**: print the numbered index to stdout, read comma/newline-separated numbers from stdin, map back to `IndexedSection` entries.
-7. Call `build_document()`: prepend the task description and `catme_excerpt`, then for each chosen section call `markdown::extract_section()` on its file to get content.
-8. Write to `args.output` path or print to stdout.
+5. Resolve sections from `--sections` (indices into the index) and/or from `--issue` with auto-include via `context-mappings.json`. The caller chooses sections explicitly or relies on the label-to-topics mapping.
+6. Call `build_document()`: prepend the task/issue header and `catme_excerpt`, then include `--include` topics and auto-included topics, then chosen sections.
+7. Write to `args.output` path or print to stdout.
+
+**`llmd index`** prints the section index (same format as before) to stdout. No stdin. The caller runs it first, then passes section numbers to `llmd compose --sections`.
 
 ## Data Flow: `llmd build` / `llmd serve`
 

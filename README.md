@@ -27,19 +27,21 @@ cargo install --path .
 ## Quick Start
 
 ```sh
-# In your project root, create a .llmd/ directory
+# 1. Create the .llmd/ directory structure
 llmd init
 
-# Edit catme.md to describe your project
-$EDITOR .llmd/catme.md
+# 2. Populate it — pipe the bootstrap prompt to your agent CLI
+llmd bootstrap | claude
+llmd bootstrap | codex
+llmd bootstrap > bootstrap-prompt.md   # or review before running
 
-# Read the entry point (agents do this first)
+# 3. Read the entry point (agents do this first)
 llmd read catme
 
-# Compose a task-context document for your current task
+# 4. Compose a task-context document for your current task
 llmd compose "add error handling to the auth module" > context.md
 
-# Browse the docs in a browser
+# 5. Browse the docs in a browser
 llmd serve
 ```
 
@@ -78,7 +80,27 @@ Each `.md` file in `.llmd/` covers a single concern (e.g. `api-standards.md`, `a
 
 ### `llmd init [--update] [ROOT]`
 
-Initialise a `.llmd/` directory. Scans the project for known agent config files and imports them into `.llmd/imported/`:
+Initialise a `.llmd/` directory. Run this first, then run `llmd bootstrap` to populate it.
+
+### `llmd bootstrap [--show-existing]`
+
+Prints a comprehensive prompt to stdout that instructs an LLM to analyse the codebase and write all `.llmd/` content. Pipe it directly to your agent CLI:
+
+```sh
+llmd bootstrap | claude
+llmd bootstrap | codex
+llmd bootstrap > prompt.md   # review before running
+```
+
+The prompt instructs the agent to:
+- Read the entire codebase before writing anything
+- Write `catme.md` (the agent entry point) with all sections filled in
+- Write topic files for every major concern (`architecture.md`, `conventions.md`, and others as appropriate)
+- Use specific, factual content — no placeholders
+
+Use `--show-existing` to include the current `catme.md` in the prompt, useful when re-bootstrapping after partial edits.
+
+Scans the project for known agent config files and imports them into `.llmd/imported/`:
 
 - `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `AGENT.md`, `JULES.md`
 - `.cursorrules`, `.cursor/rules/*.md`

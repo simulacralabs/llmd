@@ -7,8 +7,8 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 use commands::{
-    build::BuildArgs, compose::ComposeArgs, init::InitArgs, read::ReadArgs, search::SearchArgs,
-    serve::ServeArgs,
+    bootstrap::BootstrapArgs, build::BuildArgs, compose::ComposeArgs, init::InitArgs,
+    read::ReadArgs, search::SearchArgs, serve::ServeArgs,
 };
 
 #[derive(Parser)]
@@ -28,6 +28,8 @@ struct Cli {
 enum Command {
     /// Initialise a .llmd/ directory, discovering existing agent config files
     Init(InitArgs),
+    /// Print a prompt that instructs an LLM to populate .llmd/ from the codebase
+    Bootstrap(BootstrapArgs),
     /// Read a file or section from .llmd/
     Read(ReadArgs),
     /// Compose a task-context document from .llmd/ content
@@ -45,6 +47,7 @@ fn main() -> Result<()> {
 
     match cli.command {
         Command::Init(args) => commands::init::run(args),
+        Command::Bootstrap(args) => commands::bootstrap::run(args),
         Command::Read(args) => commands::read::run(args),
         Command::Compose(args) => commands::compose::run(args),
         Command::Search(args) => commands::search::run(args),

@@ -1,3 +1,4 @@
+pub mod bootstrap;
 pub mod build;
 pub mod compose;
 pub mod init;
